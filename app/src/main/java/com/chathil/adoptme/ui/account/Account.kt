@@ -94,7 +94,7 @@ private fun Header(
 ) {
     Stack(modifier = Modifier.wrapContentHeight().padding(bottom = 46.dp)) {
         Box(
-            backgroundColor = AdoptmeTheme.colors.btnActive,
+            backgroundColor = AdoptmeTheme.colors.btnPrimary,
             shape = CircleShape,
             modifier = Modifier.size(112.dp).offset(y = 90.dp)
         )
@@ -103,7 +103,7 @@ private fun Header(
             modifier = Modifier.fillMaxWidth().height(316.dp).offset(x = 96.dp)
         )
         Box(
-            backgroundColor = AdoptmeTheme.colors.btnActive,
+            backgroundColor = AdoptmeTheme.colors.btnPrimary,
             shape = CircleShape,
             modifier = Modifier.size(156.dp).offset(x = 36.dp, y = 196.dp)
         )

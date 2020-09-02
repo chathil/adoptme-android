@@ -30,9 +30,9 @@ fun AdoptmeButton(
     enabled: Boolean = true,
     shape: Shape = ButtonShape,
     border: BorderStroke? = null,
-    color: Color = AdoptmeTheme.colors.btnActive,
+    color: Color = AdoptmeTheme.colors.btnPrimary,
     contentColor: Color = AdoptmeTheme.colors.btnContent,
-    disabledContentColor: Color = AdoptmeTheme.colors.btnInActive,
+    disabledContentColor: Color = AdoptmeTheme.colors.btnContentInactive,
     padding: InnerPadding = ButtonConstants.DefaultContentPadding,
     text: @Composable () -> Unit
 ) {
@@ -66,7 +66,7 @@ fun UpButton(upPress: () -> Unit) {
             .padding(horizontal = 16.dp, vertical = 10.dp)
             .preferredSize(36.dp)
             .background(
-                color = AdoptmeTheme.colors.btnActive,
+                color = AdoptmeTheme.colors.btnPrimary,
                 shape = CircleShape
             )
     ) {

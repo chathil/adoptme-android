@@ -16,8 +16,8 @@ private val DarkColorPalette = AdoptmeColorPalette(
     uiBorder = Grey200,
     textPrimary = White,
     textSecondary = Grey200,
-    btnActive = DeepOrange300,
-    btnInActive = Grey700,
+    btnPrimary = DeepOrange300,
+    btnContentInactive = Grey700,
     btnContent = White,
     isDark = true
 )
@@ -31,8 +31,8 @@ private val LightColorPalette = AdoptmeColorPalette(
     uiBorder = Grey700,
     textPrimary = Black,
     textSecondary = Grey700,
-    btnActive = DeepOrange100,
-    btnInActive = Grey200,
+    btnPrimary = DeepOrange100,
+    btnContentInactive = Grey200,
     btnContent = DeepOrange500,
     isDark = false
 )
@@ -53,8 +53,8 @@ class AdoptmeColorPalette(
     uiBorder: Color,
     textPrimary: Color,
     textSecondary: Color,
-    btnActive: Color,
-    btnInActive: Color,
+    btnPrimary: Color,
+    btnContentInactive: Color,
     btnContent: Color,
     isDark: Boolean
 ) {
@@ -74,9 +74,9 @@ class AdoptmeColorPalette(
         private set
     var textSecondary by mutableStateOf(textSecondary)
         private set
-    var btnActive by mutableStateOf(btnActive)
+    var btnPrimary by mutableStateOf(btnPrimary)
         private set
-    var btnInActive by mutableStateOf(btnInActive)
+    var btnContentInactive by mutableStateOf(btnContentInactive)
         private set
     var btnContent by mutableStateOf(btnContent)
         private set
@@ -92,8 +92,8 @@ class AdoptmeColorPalette(
         uiBorder = other.uiBorder
         textPrimary = other.textPrimary
         textSecondary = other.textSecondary
-        btnActive = other.btnActive
-        btnInActive = other.btnInActive
+        btnPrimary = other.btnPrimary
+        btnContentInactive = other.btnContentInactive
         btnContent = other.btnContent
         isDark = other.isDark
     }
@@ -110,7 +110,7 @@ fun ProvideAdoptmeColors(
 }
 
 private val AdoptmeColorAmbient = staticAmbientOf<AdoptmeColorPalette> {
-    error("No JetsnackColorPalette provided")
+    error("No AdoptmeColorPalette provided")
 }
 
 

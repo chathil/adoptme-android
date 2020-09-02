@@ -60,7 +60,11 @@ fun Home(onPetSelected: (Pet) -> Unit, onAccountClicked: () -> Unit) {
 
 
 @Composable
-private fun AccountSection(name: String, modifier: Modifier = Modifier, onAccountClicked: () -> Unit) {
+private fun AccountSection(
+    name: String,
+    modifier: Modifier = Modifier,
+    onAccountClicked: () -> Unit
+) {
     Column {
         Row(modifier = modifier.wrapContentHeight(Alignment.CenterVertically)) {
             Column(Modifier.weight(1F)) {
