@@ -15,7 +15,7 @@ data class Pet(
     val name: String,
     val type: Type,
     val desc: String,
-    val isLiked: Boolean,
+    var isLiked: Boolean,
     val isMale: Boolean,
     val size: Size,
     val location: String,

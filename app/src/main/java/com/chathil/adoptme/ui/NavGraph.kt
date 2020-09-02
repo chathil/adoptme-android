@@ -31,7 +31,7 @@ sealed class Destination : Parcelable {
 
     @Immutable
     @Parcelize
-    data class SnackDetail(val pet: Pet) : Destination()
+    data class PetDetail(val petIndex: Int) : Destination()
 
     @Parcelize
     object Account : Destination()
@@ -41,8 +41,8 @@ sealed class Destination : Parcelable {
  * Models the navigation actions in the app.
  */
 class Actions(navigator: Navigator<Destination>) {
-    val selectPet: (Pet) -> Unit = { pet: Pet ->
-        navigator.navigate(Destination.SnackDetail(pet))
+    val selectPet: (Int) -> Unit = { pet: Int ->
+        navigator.navigate(Destination.PetDetail(pet))
     }
     val openAccount: () -> Unit = { navigator.navigate(Destination.Account) }
     val upPress: () -> Unit = {

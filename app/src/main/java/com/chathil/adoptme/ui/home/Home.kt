@@ -3,7 +3,6 @@ package com.chathil.adoptme.ui.home
 
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Divider
 import androidx.compose.material.IconButton
@@ -11,6 +10,7 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.ChevronRight
 import androidx.compose.material.icons.rounded.Favorite
+import androidx.compose.material.icons.rounded.FavoriteBorder
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -20,6 +20,7 @@ import androidx.compose.ui.platform.ContextAmbient
 import androidx.compose.ui.res.imageResource
 import androidx.compose.ui.unit.dp
 import androidx.ui.tooling.preview.Preview
+import com.chathil.adoptme.ui.AdoptmeAppState
 import com.chathil.adoptme.R
 import com.chathil.adoptme.model.*
 import com.chathil.adoptme.ui.components.*
@@ -31,7 +32,7 @@ import com.example.jetsnack.ui.utils.statusBarsPadding
 import java.util.*
 
 @Composable
-fun Home(onPetSelected: (Pet) -> Unit, onAccountClicked: () -> Unit) {
+fun Home(onPetSelected: (Int) -> Unit, onAccountClicked: () -> Unit, appState: AdoptmeAppState) {
     SysUiController.current.setStatusBarColor(
         AdoptmeTheme.colors.uiBackground.copy(
             AlphaNearTransparent
@@ -39,7 +40,11 @@ fun Home(onPetSelected: (Pet) -> Unit, onAccountClicked: () -> Unit) {
     )
     AdoptmeScaffold { innerPadding ->
         val modifier = Modifier.padding(innerPadding)
-        ScrollableColumn(modifier = modifier.padding(horizontal = padding)) {
+        val scrollState = rememberScrollState()
+        ScrollableColumn(
+            modifier = modifier.padding(horizontal = padding),
+            scrollState = scrollState
+        ) {
             Spacer(
                 modifier = Modifier
                     .statusBarsPadding()
@@ -48,10 +53,11 @@ fun Home(onPetSelected: (Pet) -> Unit, onAccountClicked: () -> Unit) {
             AccountSection(name = "Chathil", modifier) { onAccountClicked() }
             FindSection(modifier = modifier)
             Spacer(modifier = Modifier.height(16.dp))
-            Pet.allPets(ContextAmbient.current)?.forEach {
-                PetCard(pet = it) { pet ->
-                    onPetSelected(pet)
-                }
+            appState.pets.forEach {
+                PetCard(pet = it,
+                    onLikeClick = { pet -> appState.like(pet) },
+                    onPetClick = { pet -> onPetSelected(appState.pets.indexOf(pet)) }
+                )
             }
             Spacer(modifier = Modifier.height(32.dp))
         }
@@ -127,7 +133,12 @@ private fun FindSection(modifier: Modifier = Modifier) {
 }
 
 @Composable
-private fun PetCard(pet: Pet, modifier: Modifier = Modifier, onPetClick: (Pet) -> Unit) {
+private fun PetCard(
+    pet: Pet,
+    modifier: Modifier = Modifier,
+    onPetClick: (Pet) -> Unit,
+    onLikeClick: (Pet) -> Unit
+) {
     Spacer(modifier = Modifier.preferredHeight(8.dp))
     Row(
         modifier = modifier.fillMaxWidth().height(116.dp).clickable(onClick = { onPetClick(pet) })
@@ -184,10 +195,10 @@ private fun PetCard(pet: Pet, modifier: Modifier = Modifier, onPetClick: (Pet) -
                     }
                 )
                 IconButton(
-                    onClick = { }
+                    onClick = { onLikeClick(pet) }
                 ) {
                     Icon(
-                        asset = Icons.Rounded.Favorite,
+                        asset = if (pet.isLiked) Icons.Rounded.Favorite else Icons.Rounded.FavoriteBorder,
                         tint = AdoptmeTheme.colors.btnLike,
                     )
                 }
@@ -201,14 +212,6 @@ private fun PetCard(pet: Pet, modifier: Modifier = Modifier, onPetClick: (Pet) -
             AlphaNearTransparent
         )
     )
-}
-
-@Preview
-@Composable
-fun HomePreview() {
-    AdoptmeTheme(darkTheme = true) {
-        Home({}, {})
-    }
 }
 
 @Preview
@@ -251,7 +254,7 @@ fun FindSectionDarkPreview() {
 @Composable
 fun PetCardLightPreview() {
     AdoptmeTheme {
-        PetCard(Pet.fake) {}
+        PetCard(Pet.fake, onPetClick = {}, onLikeClick = {})
     }
 }
 
@@ -260,7 +263,7 @@ fun PetCardLightPreview() {
 fun PetCardDarkPreview() {
     AdoptmeTheme(darkTheme = true) {
         AdoptmeSurface {
-            PetCard(Pet.fake) {}
+            PetCard(Pet.fake, onPetClick = {}, onLikeClick = {})
         }
     }
 }

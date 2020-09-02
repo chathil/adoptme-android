@@ -30,7 +30,7 @@ import com.example.jetsnack.ui.utils.ProvideDisplayInsets
 
 
 @Composable
-fun AdoptmeApp(backDispatcher: OnBackPressedDispatcher) {
+fun AdoptmeApp(backDispatcher: OnBackPressedDispatcher, appState: AdoptmeAppState) {
     val navigator: Navigator<Destination> = rememberSavedInstanceState(
         saver = Navigator.saver(backDispatcher)
     ) {
@@ -42,11 +42,12 @@ fun AdoptmeApp(backDispatcher: OnBackPressedDispatcher) {
             Crossfade(navigator.current) { destination ->
                 when (destination) {
                     Destination.Home -> {
-                        Home(actions.selectPet, actions.openAccount)
+                        Home(actions.selectPet, actions.openAccount, appState)
                     }
-                    is Destination.SnackDetail -> PetDetail(
-                        pet = destination.pet,
-                        upPress = actions.upPress
+                    is Destination.PetDetail -> PetDetail(
+                        petIndex = destination.petIndex,
+                        upPress = actions.upPress,
+                        appState = appState
                     )
                     is Destination.Account -> Account(upPress = actions.upPress)
                 }

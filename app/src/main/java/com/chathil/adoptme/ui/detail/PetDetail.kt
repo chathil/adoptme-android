@@ -9,6 +9,7 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.ArrowBack
 import androidx.compose.material.icons.rounded.Favorite
+import androidx.compose.material.icons.rounded.FavoriteBorder
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -27,6 +28,7 @@ import com.example.jetsnack.ui.utils.SysUiController
 import com.example.jetsnack.ui.utils.statusBarsPadding
 import com.chathil.adoptme.R
 import com.chathil.adoptme.model.icon
+import com.chathil.adoptme.ui.AdoptmeAppState
 import com.chathil.adoptme.ui.components.AdoptmeScaffold
 import com.chathil.adoptme.ui.components.Chip
 import com.chathil.adoptme.ui.components.UpButton
@@ -35,14 +37,16 @@ import java.util.*
 
 @Composable
 fun PetDetail(
-    pet: Pet,
-    upPress: () -> Unit
+    petIndex: Int,
+    upPress: () -> Unit,
+    appState: AdoptmeAppState
 ) {
     SysUiController.current.setStatusBarColor(
         AdoptmeTheme.colors.uiBackground.copy(
             AlphaNearTransparent
         )
     )
+    val pet = appState.pets[petIndex]
     AdoptmeScaffold {
         ScrollableColumn {
             Stack(modifier = Modifier.wrapContentHeight().padding(bottom = 32.dp)) {
@@ -53,14 +57,14 @@ fun PetDetail(
                 )
                 UpButton(upPress)
             }
-            Body(pet = pet)
+            Body(pet = pet, onLikeClick = { appState.like(pet) })
             Spacer(modifier = Modifier.height(32.dp))
         }
     }
 }
 
 @Composable
-private fun Body(pet: Pet, modifier: Modifier = Modifier) {
+private fun Body(pet: Pet, modifier: Modifier = Modifier, onLikeClick: (Pet) -> Unit) {
     Column(modifier = modifier) {
         Row(
             modifier = Modifier.padding(horizontal = padding).fillMaxWidth(),
@@ -104,10 +108,10 @@ private fun Body(pet: Pet, modifier: Modifier = Modifier) {
                 })
             }
             IconButton(
-                onClick = { }
+                onClick = { onLikeClick(pet) }
             ) {
                 Icon(
-                    asset = Icons.Rounded.Favorite,
+                    asset = if (pet.isLiked) Icons.Rounded.Favorite else Icons.Rounded.FavoriteBorder,
                     tint = AdoptmeTheme.colors.btnLike,
                 )
             }
@@ -150,13 +154,6 @@ private fun PetSize(
     }
 }
 
-@Preview
-@Composable
-fun PetDetailPreview() {
-    AdoptmeTheme {
-        PetDetail(Pet.fake, {})
-    }
-}
 
 @Preview
 @Composable
