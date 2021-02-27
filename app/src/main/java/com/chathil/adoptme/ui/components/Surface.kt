@@ -1,15 +1,14 @@
 package com.chathil.adoptme.ui.components
 
 import androidx.compose.foundation.*
+import androidx.compose.foundation.layout.Box
+import androidx.compose.material.*
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.Providers
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.drawShadow
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.RectangleShape
-import androidx.compose.ui.graphics.Shape
-import androidx.compose.ui.graphics.compositeOver
+import androidx.compose.ui.graphics.*
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
@@ -26,17 +25,30 @@ fun AdoptmeSurface(
     elevation: Dp = 0.dp,
     content: @Composable () -> Unit
 ) {
-    Box(
-        modifier = modifier.drawShadow(elevation = elevation, shape = shape, clip = false)
-            .zIndex(elevation.value)
-            .then(if (border != null) Modifier.border(border, shape) else Modifier)
-            .background(
-                color = getBackgroundColorForElevation(color, elevation),
-                shape = shape
-            )
-            .clip(shape)
+    val elevationPx = with(LocalDensity.current) { elevation.toPx() }
+    val elevationOverlay = LocalElevationOverlay.current
+    val absoluteElevation = LocalAbsoluteElevation.current + elevation
+    val backgroundColor = if (color == MaterialTheme.colors.surface && elevationOverlay != null) {
+        elevationOverlay.apply(color, absoluteElevation)
+    } else {
+        color
+    }
+    CompositionLocalProvider(
+        LocalContentColor provides contentColor,
+        LocalAbsoluteElevation provides absoluteElevation
     ) {
-        Providers(ContentColorAmbient provides contentColor, children = content)
+        Box(
+            modifier.graphicsLayer(shadowElevation = elevationPx, shape = shape)
+                .then(if (border != null) Modifier.border(border, shape) else Modifier)
+                .background(
+                    color = backgroundColor,
+                    shape = shape
+                )
+                .clip(shape),
+            propagateMinConstraints = true
+        ) {
+            content()
+        }
     }
 }
 

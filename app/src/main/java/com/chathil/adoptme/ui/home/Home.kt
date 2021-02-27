@@ -1,12 +1,13 @@
 package com.chathil.adoptme.ui.home
 
 
-import androidx.compose.foundation.*
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.Divider
-import androidx.compose.material.IconButton
-import androidx.compose.material.MaterialTheme
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.ChevronRight
 import androidx.compose.material.icons.rounded.Favorite
@@ -16,24 +17,30 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.ContextAmbient
-import androidx.compose.ui.res.imageResource
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.ui.tooling.preview.Preview
-import com.chathil.adoptme.ui.AdoptmeAppState
 import com.chathil.adoptme.R
-import com.chathil.adoptme.model.*
+import com.chathil.adoptme.model.Pet
+import com.chathil.adoptme.model.fake
+import com.chathil.adoptme.model.icon
+import com.chathil.adoptme.model.image
+import com.chathil.adoptme.ui.AdoptmeAppState
+import com.chathil.adoptme.ui.Screen
 import com.chathil.adoptme.ui.components.*
 import com.chathil.adoptme.ui.theme.AdoptmeTheme
 import com.chathil.adoptme.ui.theme.AlphaNearTransparent
 import com.chathil.adoptme.ui.theme.padding
-import com.example.jetsnack.ui.utils.SysUiController
-import com.example.jetsnack.ui.utils.statusBarsPadding
+import com.chathil.adoptme.ui.utils.LocalSysUiController
+import dev.chrisbanes.accompanist.insets.statusBarsPadding
 import java.util.*
 
 @Composable
-fun Home(onPetSelected: (Int) -> Unit, onAccountClicked: () -> Unit, appState: AdoptmeAppState) {
-    SysUiController.current.setStatusBarColor(
+fun Home(
+    navigateTo: (Screen) -> Unit, appState: AdoptmeAppState
+) {
+    LocalSysUiController.current.setStatusBarColor(
         AdoptmeTheme.colors.uiBackground.copy(
             AlphaNearTransparent
         )
@@ -41,22 +48,23 @@ fun Home(onPetSelected: (Int) -> Unit, onAccountClicked: () -> Unit, appState: A
     AdoptmeScaffold { innerPadding ->
         val modifier = Modifier.padding(innerPadding)
         val scrollState = rememberScrollState()
-        ScrollableColumn(
-            modifier = modifier.padding(horizontal = padding),
-            scrollState = scrollState
+        Column(
+            modifier = modifier
+                .verticalScroll(scrollState)
+                .padding(horizontal = padding)
         ) {
             Spacer(
                 modifier = Modifier
                     .statusBarsPadding()
-                    .preferredHeight(16.dp)
+                    .height(16.dp)
             )
-            AccountSection(name = "Chathil", modifier) { onAccountClicked() }
+            AccountSection(name = "Chathil", modifier) { navigateTo(Screen.Account) }
             FindSection(modifier = modifier)
             Spacer(modifier = Modifier.height(16.dp))
             appState.pets.forEach {
                 PetCard(pet = it,
                     onLikeClick = { pet -> appState.like(pet) },
-                    onPetClick = { pet -> onPetSelected(appState.pets.indexOf(pet)) }
+                    onPetClick = { pet ->  navigateTo(Screen.Detail(appState.pets.indexOf(pet)))}
                 )
             }
             Spacer(modifier = Modifier.height(32.dp))
@@ -83,22 +91,23 @@ private fun AccountSection(
                     "Lorem ipsum dolor sit amet,consectetur adipiscing elit, sed do",
                     style = MaterialTheme.typography.caption
                 )
-                Spacer(modifier = Modifier.preferredHeight(8.dp))
+                Spacer(modifier = Modifier.height(8.dp))
                 AdoptmeButton(onClick = onAccountClicked) {
                     Row {
                         ProvideTextStyle(value = MaterialTheme.typography.body1) {
                             Text("Account")
                         }
-                        Spacer(modifier = Modifier.preferredWidth(8.dp))
+                        Spacer(modifier = Modifier.width(8.dp))
                         Icon(
-                            asset = Icons.Rounded.ChevronRight,
+                            imageVector = Icons.Rounded.ChevronRight,
                             tint = AdoptmeTheme.colors.btnContent,
+                            contentDescription = null
                         )
                     }
                 }
             }
-            Spacer(Modifier.preferredWidth(16.dp))
-            CircleImage(modifier = Modifier.size(116.dp), imageResource(id = R.drawable.me))
+            Spacer(Modifier.width(16.dp))
+            CircleImage(modifier = Modifier.size(116.dp), painterResource(id = R.drawable.me))
         }
         AccountCompletion(modifier = modifier)
     }
@@ -106,21 +115,25 @@ private fun AccountSection(
 
 @Composable
 private fun AccountCompletion(modifier: Modifier = Modifier) {
-    Text("Complete Your Profile", modifier = Modifier.padding(top = 16.dp, bottom = 8.dp))
-    AdoptmeProgressBar(progress = 0.7f, modifier = Modifier.preferredWidth(216.dp))
+    Column(modifier = modifier) {
+        Text("Complete Your Profile", modifier = Modifier.padding(top = 16.dp, bottom = 8.dp))
+        AdoptmeProgressBar(progress = 0.7f, modifier = Modifier.width(216.dp))
+    }
 }
 
 @Composable
 private fun FindSection(modifier: Modifier = Modifier) {
-    Row(verticalGravity = Alignment.CenterVertically, modifier = modifier) {
+    Row(verticalAlignment = Alignment.CenterVertically, modifier = modifier) {
         AdoptmeSurface(
             color = Color.Transparent,
             modifier = Modifier.padding(top = 16.dp)
         ) {
-            Image(asset = imageResource(id = R.drawable.ill_cat), modifier = Modifier.width(116.dp))
+            Image(painter = painterResource(id = R.drawable.ill_cat), modifier = Modifier.width(116.dp), contentDescription = null)
         }
-        Spacer(modifier = Modifier.preferredWidth(16.dp))
-        Column(modifier = Modifier.fillMaxHeight().wrapContentHeight()) {
+        Spacer(modifier = Modifier.width(16.dp))
+        Column(modifier = Modifier
+            .fillMaxHeight()
+            .wrapContentHeight()) {
             Text(
                 "Find", style = MaterialTheme.typography.h4, color = AdoptmeTheme.colors.textPrimary
             )
@@ -139,32 +152,38 @@ private fun PetCard(
     onPetClick: (Pet) -> Unit,
     onLikeClick: (Pet) -> Unit
 ) {
-    Spacer(modifier = Modifier.preferredHeight(8.dp))
+    Spacer(modifier = Modifier.height(8.dp))
     Row(
-        modifier = modifier.fillMaxWidth().height(116.dp).clickable(onClick = { onPetClick(pet) })
+        modifier = modifier
+            .fillMaxWidth()
+            .height(116.dp)
+            .clickable(onClick = { onPetClick(pet) })
     ) {
         AdoptmeSurface(
             color = MaterialTheme.colors.secondary,
             modifier = Modifier.size(116.dp),
             shape = RoundedCornerShape(
-                topLeft = 16.dp,
-                bottomLeft = 16.dp,
-                topRight = 0.dp,
-                bottomRight = 0.dp
+                topStart = 16.dp,
+                bottomStart = 16.dp,
+                topEnd = 0.dp,
+                bottomEnd = 0.dp
             )
         ) {
             Image(
-                asset = imageResource(id = pet.image(ContextAmbient.current)),
+                painter = painterResource(id = pet.image(LocalContext.current)),
                 modifier = Modifier.fillMaxSize(),
-                contentScale = ContentScale.Crop
+                contentScale = ContentScale.Crop,
+                contentDescription = null
             )
         }
-        Spacer(modifier = Modifier.preferredWidth(8.dp))
+        Spacer(modifier = Modifier.width(8.dp))
         Column(
-            modifier = Modifier.fillMaxHeight().fillMaxWidth(1f),
+            modifier = Modifier
+                .fillMaxHeight()
+                .fillMaxWidth(1f),
             verticalArrangement = Arrangement.SpaceBetween
         ) {
-            Box {
+            Column {
                 Text(
                     pet.name,
                     style = MaterialTheme.typography.h6,
@@ -175,16 +194,17 @@ private fun PetCard(
             Row(
                 Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
-                verticalGravity = Alignment.CenterVertically
+                verticalAlignment = Alignment.CenterVertically
             ) {
                 Chip(
                     start = {
                         Icon(
-                            asset = imageResource(
-                                id = pet.icon(ContextAmbient.current)
+                            painter = painterResource(
+                                id = pet.icon()
                             ),
                             tint = AdoptmeTheme.colors.primary,
-                            modifier = Modifier.size(16.dp)
+                            modifier = Modifier.size(16.dp),
+                            contentDescription = null
                         )
                     },
                     content = {
@@ -198,14 +218,15 @@ private fun PetCard(
                     onClick = { onLikeClick(pet) }
                 ) {
                     Icon(
-                        asset = if (pet.isLiked) Icons.Rounded.Favorite else Icons.Rounded.FavoriteBorder,
+                        imageVector = if (pet.isLiked) Icons.Rounded.Favorite else Icons.Rounded.FavoriteBorder,
                         tint = AdoptmeTheme.colors.btnLike,
+                        contentDescription = null
                     )
                 }
             }
         }
     }
-    Spacer(modifier = Modifier.preferredHeight(8.dp))
+    Spacer(modifier = Modifier.height(8.dp))
     Divider(
         modifier = Modifier.padding(start = 124.dp),
         color = AdoptmeTheme.colors.primaryVariant.copy(

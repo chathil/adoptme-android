@@ -1,6 +1,5 @@
 package com.chathil.adoptme.ui.components
 
-import androidx.compose.foundation.Text
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
@@ -16,29 +15,29 @@ import com.chathil.adoptme.ui.theme.AdoptmeTheme
 
 @Composable
 fun AdoptmeProgressBar(
-    progress: Float = 0f,
     modifier: Modifier = Modifier,
+    progress: Float = 0f,
     color: Color = AdoptmeTheme.colors.primaryVariant,
     borderColor: Color = AdoptmeTheme.colors.primary
 ) {
     val progressBarShape = RoundedCornerShape(percent = 50)
     Column(modifier = modifier) {
-        Stack {
+        Box {
             Spacer(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .preferredHeight(16.dp)
+                    .height(16.dp)
                     .border(2.dp, borderColor, progressBarShape)
             )
             Spacer(
                 modifier = Modifier
                     .fillMaxWidth(progress)
-                    .preferredHeight(16.dp)
+                    .height(16.dp)
                     .clip(progressBarShape)
                     .background(
                         color, progressBarShape.copy(
-                            topRight = CornerSize(0.dp),
-                            bottomRight = CornerSize(0.dp)
+                            topEnd = CornerSize(0.dp),
+                            bottomEnd = CornerSize(0.dp)
                         )
                     )
             )

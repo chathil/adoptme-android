@@ -4,13 +4,16 @@ import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.MaterialTheme
+import androidx.compose.material.ProvideTextStyle
+import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.imageResource
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
-import androidx.ui.tooling.preview.Preview
+import androidx.compose.ui.tooling.preview.Preview
 import com.chathil.adoptme.R
 import com.chathil.adoptme.ui.theme.AdoptmeTheme
 
@@ -28,17 +31,17 @@ fun Chip(
             .border(2.dp, color, RoundedCornerShape(50)).padding(8.dp)
     ) {
         ProvideTextStyle(value = MaterialTheme.typography.caption) {
-            Spacer(modifier = Modifier.preferredWidth(4.dp))
+            Spacer(modifier = Modifier.size(4.dp))
             start?.let {
                 it()
-                Spacer(modifier = Modifier.preferredWidth(8.dp))
+                Spacer(modifier = Modifier.size(8.dp))
             }
             content()
             trailing?.let {
-                Spacer(modifier = Modifier.preferredWidth(8.dp))
+                Spacer(modifier = Modifier.size(8.dp))
                 it()
             }
-            Spacer(modifier = Modifier.preferredWidth(4.dp))
+            Spacer(modifier = Modifier.size(4.dp))
         }
     }
 }
@@ -49,14 +52,16 @@ fun Chip(
 fun ChipPreview() {
     Chip(start = {
         Image(
-            asset = imageResource(id = R.drawable.icn_otter),
-            modifier = Modifier.size(16.dp).padding(start = 4.dp)
+            painter = painterResource(id = R.drawable.icn_otter),
+            modifier = Modifier.size(16.dp).padding(start = 4.dp),
+            contentDescription = null
         )
     },
         content = { Text("Account", modifier = Modifier.padding(end = 4.dp)) }, trailing = {
             Image(
-                asset = imageResource(id = R.drawable.icn_otter),
-                modifier = Modifier.size(16.dp).padding(start = 4.dp)
+                painter = painterResource(id = R.drawable.icn_otter),
+                modifier = Modifier.size(16.dp).padding(start = 4.dp),
+                contentDescription = null
             )
         })
 }

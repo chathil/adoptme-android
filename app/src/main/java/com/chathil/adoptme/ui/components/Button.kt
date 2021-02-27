@@ -1,61 +1,133 @@
 package com.chathil.adoptme.ui.components
 
-import androidx.compose.foundation.*
-import androidx.compose.foundation.layout.InnerPadding
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.preferredSize
-import androidx.compose.foundation.layout.preferredSizeIn
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.indication
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.ButtonConstants
-import androidx.compose.material.IconButton
-import androidx.compose.material.MaterialTheme
+import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.ArrowBack
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.Providers
+import androidx.compose.material.ripple.rememberRipple
+import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
-import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.graphics.compositeOver
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.dp
 import com.chathil.adoptme.ui.theme.AdoptmeTheme
-import com.example.jetsnack.ui.utils.statusBarsPadding
+import dev.chrisbanes.accompanist.insets.statusBarsPadding
+
+@Composable
+fun adoptmeButtonColors(
+    backgroundColor: Color = AdoptmeTheme.colors.primary,
+    contentColor: Color = contentColorFor(backgroundColor),
+    disabledBackgroundColor: Color = MaterialTheme.colors.onSurface.copy(alpha = 0.12f)
+        .compositeOver(MaterialTheme.colors.surface),
+    disabledContentColor: Color = MaterialTheme.colors.onSurface
+        .copy(alpha = ContentAlpha.disabled)
+): ButtonColors = AdoptmeDefaultButtonColors(
+    backgroundColor = backgroundColor,
+    contentColor = contentColor,
+    disabledBackgroundColor = disabledBackgroundColor,
+    disabledContentColor = disabledContentColor
+)
+
+@Immutable
+private class AdoptmeDefaultButtonColors(
+    private val backgroundColor: Color,
+    private val contentColor: Color,
+    private val disabledBackgroundColor: Color,
+    private val disabledContentColor: Color
+) : ButtonColors {
+    @Composable
+    override fun backgroundColor(enabled: Boolean): State<Color> {
+        return rememberUpdatedState(if (enabled) backgroundColor else disabledBackgroundColor)
+    }
+
+    @Composable
+    override fun contentColor(enabled: Boolean): State<Color> {
+        return rememberUpdatedState(if (enabled) contentColor else disabledContentColor)
+    }
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other == null || this::class != other::class) return false
+
+        other as AdoptmeDefaultButtonColors
+
+        if (backgroundColor != other.backgroundColor) return false
+        if (contentColor != other.contentColor) return false
+        if (disabledBackgroundColor != other.disabledBackgroundColor) return false
+        if (disabledContentColor != other.disabledContentColor) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        var result = backgroundColor.hashCode()
+        result = 31 * result + contentColor.hashCode()
+        result = 31 * result + disabledBackgroundColor.hashCode()
+        result = 31 * result + disabledContentColor.hashCode()
+        return result
+    }
+}
+
 
 @Composable
 fun AdoptmeButton(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
-    shape: Shape = ButtonShape,
+    interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
+    elevation: ButtonElevation? = ButtonDefaults.elevation(),
+    shape: Shape = MaterialTheme.shapes.small,
     border: BorderStroke? = null,
-    color: Color = AdoptmeTheme.colors.btnPrimary,
-    contentColor: Color = AdoptmeTheme.colors.btnContent,
-    disabledContentColor: Color = AdoptmeTheme.colors.btnContentInactive,
-    padding: InnerPadding = ButtonConstants.DefaultContentPadding,
-    text: @Composable () -> Unit
+    colors: ButtonColors = adoptmeButtonColors(),
+    contentPadding: PaddingValues = ButtonDefaults.ContentPadding,
+    content: @Composable RowScope.() -> Unit
 ) {
-    Providers(ContentColorAmbient provides if (enabled) contentColor else disabledContentColor) {
-        ProvideTextStyle(MaterialTheme.typography.button) {
-            Box(
-                modifier = modifier
-                    .preferredSizeIn(minWidth = 64.dp, minHeight = 36.dp)
-                    .clip(shape)
-                    .then(if (border != null) Modifier.border(border, shape) else Modifier)
-                    .semantics(mergeAllDescendants = true, properties = { })
-                    .clickable(onClick = onClick, enabled = enabled),
-                paddingStart = padding.start,
-                paddingTop = padding.top,
-                paddingEnd = padding.end,
-                paddingBottom = padding.bottom,
-                gravity = ContentGravity.Center,
-                children = text,
-                backgroundColor = color
-            )
+    // TODO(aelias): Avoid manually putting the clickable above the clip and
+    // the ripple below the clip once http://b/157687898 is fixed and we have
+    // more flexibility to move the clickable modifier (see candidate approach
+    // aosp/1361921)
+    val contentColor by colors.contentColor(enabled)
+    Surface(
+        shape = shape,
+        color = colors.backgroundColor(enabled).value,
+        contentColor = contentColor.copy(alpha = 1f),
+        border = border,
+        elevation = elevation?.elevation(enabled, interactionSource)?.value ?: 0.dp,
+        modifier = modifier.clickable(
+            onClick = onClick,
+            enabled = enabled,
+            role = Role.Button,
+            interactionSource = interactionSource,
+            indication = null
+        )
+    ) {
+        CompositionLocalProvider(LocalContentAlpha provides contentColor.alpha) {
+            ProvideTextStyle(
+                value = MaterialTheme.typography.button
+            ) {
+                Row(
+                    Modifier
+                        .sizeIn(minWidth = 64.dp, minHeight = 36.dp)
+                        .indication(interactionSource, rememberRipple())
+                        .padding(contentPadding),
+                    horizontalArrangement = Arrangement.Center,
+                    verticalAlignment = Alignment.CenterVertically,
+                    content = content
+                )
+            }
         }
     }
 }
+
 
 @Composable
 fun UpButton(upPress: () -> Unit) {
@@ -64,17 +136,16 @@ fun UpButton(upPress: () -> Unit) {
         modifier = Modifier
             .statusBarsPadding()
             .padding(horizontal = 16.dp, vertical = 10.dp)
-            .preferredSize(36.dp)
+            .size(36.dp)
             .background(
                 color = AdoptmeTheme.colors.btnPrimary,
                 shape = CircleShape
             )
     ) {
         Icon(
-            asset = Icons.Outlined.ArrowBack,
-            tint = AdoptmeTheme.colors.btnContent
+            imageVector = Icons.Outlined.ArrowBack,
+            tint = AdoptmeTheme.colors.btnContent,
+            contentDescription = null
         )
     }
 }
-
-private val ButtonShape = RoundedCornerShape(percent = 50)

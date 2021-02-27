@@ -5,7 +5,6 @@ import androidx.compose.material.Colors
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.*
 import androidx.compose.ui.graphics.Color
-import com.example.jetsnack.ui.utils.SysUiController
 
 private val DarkColorPalette = AdoptmeColorPalette(
     primary = DeepOrange300,
@@ -38,12 +37,11 @@ private val LightColorPalette = AdoptmeColorPalette(
 )
 
 object AdoptmeTheme {
-    @Composable
     val colors: AdoptmeColorPalette
-        get() = AdoptmeColorAmbient.current
+        @Composable
+        get() = LocalAdoptmeColorAmbient.current
 }
 
-@Stable
 class AdoptmeColorPalette(
     primary: Color,
     primaryVariant: Color,
@@ -106,10 +104,10 @@ fun ProvideAdoptmeColors(
 ) {
     val colorPalette = remember { colors }
     colorPalette.update(colors)
-    Providers(AdoptmeColorAmbient provides colorPalette, children = content)
+    CompositionLocalProvider(LocalAdoptmeColorAmbient provides colorPalette, content = content)
 }
 
-private val AdoptmeColorAmbient = staticAmbientOf<AdoptmeColorPalette> {
+private val LocalAdoptmeColorAmbient = staticCompositionLocalOf<AdoptmeColorPalette> {
     error("No AdoptmeColorPalette provided")
 }
 
@@ -122,12 +120,12 @@ fun AdoptmeTheme(darkTheme: Boolean = isSystemInDarkTheme(), content: @Composabl
         LightColorPalette
     }
 
-    val sysUiController = SysUiController.current
-    onCommit(sysUiController, colors.uiBackground) {
-        sysUiController.setSystemBarsColor(
-            color = colors.uiBackground.copy(AlphaNearTransparent)
-        )
-    }
+//    val sysUiController = SysUiController.current
+//    onCommit(sysUiController, colors.uiBackground) {
+//        sysUiController.setSystemBarsColor(
+//            color = colors.uiBackground.copy(AlphaNearTransparent)
+//        )
+//    }
 
     ProvideAdoptmeColors(colors) {
         MaterialTheme(

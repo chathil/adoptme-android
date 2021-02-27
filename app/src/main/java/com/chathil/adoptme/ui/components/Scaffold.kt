@@ -1,7 +1,7 @@
 package com.chathil.adoptme.ui.components
 
 import androidx.compose.foundation.layout.ColumnScope
-import androidx.compose.foundation.layout.InnerPadding
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -15,21 +15,22 @@ import com.chathil.adoptme.ui.theme.AdoptmeTheme
 fun AdoptmeScaffold(
     modifier: Modifier = Modifier,
     scaffoldState: ScaffoldState = rememberScaffoldState(),
-    topBar: @Composable (() -> Unit)? = null,
-    bottomBar: @Composable (() -> Unit)? = null,
+    topBar: @Composable () -> Unit = {},
+    bottomBar: @Composable () -> Unit = {},
     snackbarHost: @Composable (SnackbarHostState) -> Unit = { SnackbarHost(it) },
-    floatingActionButton: @Composable (() -> Unit)? = null,
+    floatingActionButton: @Composable () -> Unit = {},
     floatingActionButtonPosition: FabPosition = FabPosition.End,
     isFloatingActionButtonDocked: Boolean = false,
     drawerContent: @Composable (ColumnScope.() -> Unit)? = null,
+    drawerGesturesEnabled: Boolean = true,
     drawerShape: Shape = MaterialTheme.shapes.large,
-    drawerElevation: Dp = DrawerConstants.DefaultElevation,
+    drawerElevation: Dp = DrawerDefaults.Elevation,
     drawerBackgroundColor: Color = AdoptmeTheme.colors.uiBackground,
     drawerContentColor: Color = AdoptmeTheme.colors.textSecondary,
     drawerScrimColor: Color = AdoptmeTheme.colors.uiBorder,
     backgroundColor: Color = AdoptmeTheme.colors.uiBackground,
     contentColor: Color = AdoptmeTheme.colors.textSecondary,
-    bodyContent: @Composable (InnerPadding) -> Unit
+    content: @Composable (PaddingValues) -> Unit
 ) {
     Scaffold(
         modifier = modifier,
@@ -41,6 +42,7 @@ fun AdoptmeScaffold(
         floatingActionButtonPosition = floatingActionButtonPosition,
         isFloatingActionButtonDocked = isFloatingActionButtonDocked,
         drawerContent = drawerContent,
+        drawerGesturesEnabled = drawerGesturesEnabled,
         drawerShape = drawerShape,
         drawerElevation = drawerElevation,
         drawerBackgroundColor = drawerBackgroundColor,
@@ -48,6 +50,6 @@ fun AdoptmeScaffold(
         drawerScrimColor = drawerScrimColor,
         backgroundColor = backgroundColor,
         contentColor = contentColor,
-        bodyContent = bodyContent
+        content = content
     )
 }

@@ -15,3 +15,4 @@ val Black = Color(0xFF121212)
 
 const val AlphaNearOpaque = 0.95f
 const val AlphaNearTransparent = 0.4f
+

@@ -1,15 +1,11 @@
 package com.chathil.adoptme.model
 
 import android.content.Context
-import android.graphics.drawable.Drawable
-import android.os.Parcelable
-import androidx.compose.ui.platform.ContextAmbient
 import com.chathil.adoptme.R
 import com.squareup.moshi.*
-import kotlinx.android.parcel.Parcelize
 
 @JsonClass(generateAdapter = true)
-@Parcelize
+@kotlinx.parcelize.Parcelize
 data class Pet(
     val id: Int,
     val name: String,
@@ -20,7 +16,7 @@ data class Pet(
     val size: Size,
     val location: String,
     val imageName: String,
-) : Parcelable {
+) : android.os.Parcelable {
     enum class Type {
         CAT, DOG, CHAMELEON
     }
@@ -36,7 +32,7 @@ data class Pet(
                 "Cat" -> Type.CAT
                 "Dog" -> Type.DOG
                 "Chameleon" -> Type.CHAMELEON
-                else -> throw JsonDataException("unknown suit: $type");
+                else -> throw JsonDataException("unknown suit: $type")
             }
         }
     }
@@ -48,7 +44,7 @@ data class Pet(
                 "S" -> Size.S
                 "M" -> Size.M
                 "L" -> Size.L
-                else -> throw JsonDataException("unknown suit: $size");
+                else -> throw JsonDataException("unknown suit: $size")
             }
         }
     }
@@ -68,17 +64,18 @@ fun Pet.Companion.allPets(applicationContext: Context): List<Pet>? {
 
 val Pet.Companion.fake: Pet
     get() = Pet(
-        1,
-        "Fake 1",
-        Pet.Type.CAT,
-        "This is a cat, not a dog",
-        false,
-        true,
-        Pet.Size.M,
-        "Bireuen, Aceh",
-        "cat-peep"
+        id = 1,
+        name = "Fake 1",
+        type = Pet.Type.CAT,
+        desc = "This is a cat, not a dog",
+        isLiked = false,
+        isMale = true,
+        size = Pet.Size.M,
+        location = "Bireuen, Aceh",
+        imageName = "cat-peep"
     )
 
+@Suppress("unused")
 val Pet.Companion.fakes: List<Pet>
     get() = listOf(Pet.fake, Pet.fake.copy(id = 2))
 
@@ -88,7 +85,7 @@ fun Pet.image(context: Context): Int = context.resources.getIdentifier(
     context.packageName
 )
 
-fun Pet.icon(context: Context): Int = when (type) {
+fun Pet.icon(): Int = when (type) {
     Pet.Type.CAT -> R.drawable.icn_cat
     Pet.Type.CHAMELEON -> R.drawable.icn_otter
     Pet.Type.DOG -> R.drawable.icn_dog

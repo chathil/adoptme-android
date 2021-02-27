@@ -1,22 +1,19 @@
 package com.chathil.adoptme.ui
 
 import android.os.Bundle
-import android.util.Log
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Surface
-import androidx.compose.runtime.Providers
 import androidx.compose.runtime.remember
-import androidx.compose.ui.platform.ContextAmbient
-import androidx.compose.ui.platform.setContent
 import androidx.core.view.WindowCompat
 import com.chathil.adoptme.model.Pet
 import com.chathil.adoptme.model.allPets
-import com.chathil.adoptme.ui.theme.AdoptmeTheme
-import com.example.jetsnack.ui.utils.SysUiController
-import com.example.jetsnack.ui.utils.SystemUiController
+import androidx.activity.compose.setContent
+import androidx.compose.runtime.CompositionLocalProvider
+import com.chathil.adoptme.ui.utils.LocalSysUiController
+import com.chathil.adoptme.ui.utils.SystemUiController
 
 class MainActivity : AppCompatActivity() {
+    private val navigationViewModel by viewModels<NavigationViewModel>()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         WindowCompat.setDecorFitsSystemWindows(window, false)
@@ -24,14 +21,16 @@ class MainActivity : AppCompatActivity() {
         val appState = AdoptmeAppState(pets ?: listOf())
         setContent {
             val systemUiController = remember { SystemUiController(window) }
-            Providers(SysUiController provides systemUiController) {
-                AdoptmeApp(onBackPressedDispatcher, appState)
+            CompositionLocalProvider(LocalSysUiController provides systemUiController) {
+                AdoptmeApp(appState, navigationViewModel)
             }
         }
     }
 
-    companion object {
-        val TAG = MainActivity::class.java.simpleName
+    override fun onBackPressed() {
+        if (!navigationViewModel.onBack()) {
+            super.onBackPressed()
+        }
     }
 }
 
