@@ -24,11 +24,11 @@ import dev.chrisbanes.accompanist.insets.statusBarsPadding
 
 @Composable
 fun adoptmeButtonColors(
-    backgroundColor: Color = AdoptmeTheme.colors.primary,
-    contentColor: Color = contentColorFor(backgroundColor),
+    backgroundColor: Color = AdoptmeTheme.colors.btnPrimary,
+    contentColor: Color = AdoptmeTheme.colors.btnContent,
     disabledBackgroundColor: Color = MaterialTheme.colors.onSurface.copy(alpha = 0.12f)
         .compositeOver(MaterialTheme.colors.surface),
-    disabledContentColor: Color = MaterialTheme.colors.onSurface
+    disabledContentColor: Color = AdoptmeTheme.colors.btnContentInactive
         .copy(alpha = ContentAlpha.disabled)
 ): ButtonColors = AdoptmeDefaultButtonColors(
     backgroundColor = backgroundColor,
